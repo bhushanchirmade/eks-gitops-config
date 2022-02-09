@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eks-gitops
+  namespace: eks-gitops
+  labels:
+    app: eks-gitops
+  annotations:
+    # Container Image Automated Updates
+    flux.weave.works/automated: "true"
+    # do not apply this manifest on the cluster
+    #flux.weave.works/ignore: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-gitops
+  template:
+    metadata:
+      labels:
+        app: eks-gitops
+    spec:
+      containers:
+      - name: eks-gitops
+        image: 647175738067.dkr.ecr.us-west-2.amazonaws.com/eks-gitops:c9b27ffb
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
